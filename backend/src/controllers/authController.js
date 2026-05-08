@@ -78,8 +78,11 @@ const login = async (req, res, next) => {
 
 // POST /api/auth/logout
 const logout = async (req, res) => {
+  const isProd = process.env.NODE_ENV === 'production';
   res.cookie('token', '', {
     httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'strict',
     expires: new Date(0)
   });
   sendSuccess(res, null, 'Logged out successfully');

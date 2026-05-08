@@ -21,8 +21,21 @@ const app = express();
 
 // middleware
 app.use(helmet());
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://web-project-lime-alpha.vercel.app',
+  process.env.CLIENT_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // allow requests with no origin (e.g. mobile apps, curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
