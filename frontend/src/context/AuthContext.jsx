@@ -16,18 +16,21 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     const res = await loginUser(credentials)
+    if (res.data?.token) localStorage.setItem('fv_token', res.data.token)
     setUser(res.data.user)
     return res
   }
 
   const register = async (userData) => {
     const res = await registerUser(userData)
+    if (res.data?.token) localStorage.setItem('fv_token', res.data.token)
     setUser(res.data.user)
     return res
   }
 
   const logout = async () => {
     await logoutUser()
+    localStorage.removeItem('fv_token')
     setUser(null)
   }
 

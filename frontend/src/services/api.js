@@ -8,6 +8,17 @@ const api = axios.create({
   }
 });
 
+// Attach stored token as Authorization header on every request.
+// This is the fallback for mobile browsers (Safari iOS) that block
+// cross-site cookies — the backend accepts either cookies or Bearer token.
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('fv_token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -17,6 +28,7 @@ api.interceptors.response.use(
       // Only redirect when a protected action fails mid-session.
       const isAuthCheck = error.config?.url?.includes('/auth/me');
       if (!isAuthCheck && window.location.pathname !== '/login') {
+        localStorage.removeItem('fv_token');
         window.location.href = '/login';
       }
     }
